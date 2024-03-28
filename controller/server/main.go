@@ -71,6 +71,7 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.Dir(*public)))
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("new WebSocket connection")
 		c, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			log.Print("upgrade:", err)
@@ -83,6 +84,7 @@ func main() {
 			log.Println("read:", err)
 			return
 		}
+
 		if bytes.Equal(message, []byte("web")) {
 			log.Println("new web client")
 			handleWebClient(c)
