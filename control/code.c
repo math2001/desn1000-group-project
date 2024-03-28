@@ -178,6 +178,8 @@ void implement_movement()
   {
     front_left_stop();
     front_right_stop();
+    back_left_stop();
+    back_right_stop();
   }
   else if (movement == MOVEMENT_FORWARDS)
   {
