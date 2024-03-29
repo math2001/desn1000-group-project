@@ -97,7 +97,7 @@ void front_left_stop()
 {
   digitalWrite(MOTOR_FRONT_LEFT_1, LOW);
   digitalWrite(MOTOR_FRONT_LEFT_2, LOW);
-  Serial.print("  => motor front left pin 1: LOW   motor front left pin 2: LOW");
+  Serial.println("  => motor front left pin 1: LOW   motor front left pin 2: LOW");
 }
 
 void front_right_forwards()
@@ -145,7 +145,7 @@ void back_left_stop()
 {
   digitalWrite(MOTOR_BACK_LEFT_1, LOW);
   digitalWrite(MOTOR_BACK_LEFT_2, LOW);
-  Serial.print("  => motor back left pin 1: LOW   motor back left pin 2: LOW");
+  Serial.println("  => motor back left pin 1: LOW   motor back left pin 2: LOW");
 }
 
 void back_right_forwards()

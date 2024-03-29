@@ -6,6 +6,22 @@
 
 Servo servoh;
 
+// hangle must be in degrees, between 0 and 180
+void set_hangle(int hangle)
+{
+  // hangle in degrees
+  /* Serial.print("; Rotating to"); */
+  /* Serial.print(hangle, DEC); */
+  /* Serial.println(); */
+  hangle = constrain(hangle, 0, 180);
+
+  servoh.write(hangle);
+}
+
+// the reason we use a global start is so that we know we won't wrap around
+// before 49 days. Otherwise we might get unlucky and wrap during our run!
+unsigned long global_start = 0;
+
 void setup() {
   Serial.begin(9600);
   pinMode(PIN_LED, 13);
@@ -13,30 +29,12 @@ void setup() {
 
   pinMode(PIN_ULTR_TRIG, OUTPUT);
   pinMode(PIN_ULTR_ECHO, INPUT);
-  
 
-  Serial.println("Init");
+  Serial.println("reset");
+  set_hangle(0);
+  delay(1000);
 
-  // long duration, inches, cm;
-  // for (int hangle = 0; hangle <= 180; hangle += 10)
-  // {
-  //   set_hangle(hangle);
-
-  //   digitalWrite(PIN_ULTR_TRIG, LOW);
-  //   delayMicroseconds(2);
-  //   digitalWrite(PIN_ULTR_TRIG, HIGH);
-  //   delayMicroseconds(10);
-  //   digitalWrite(PIN_ULTR_TRIG, LOW);
-
-  //   duration = pulseIn(PIN_ULTR_ECHO, HIGH);
-  //   cm = duration * 0.034 / 2;
-  //   Serial.print(cm);
-  //   Serial.print("cm");
-  //   Serial.println();
-
-  //   delay(1000);
-  // }
-  // Serial.println("Done");
+  global_start = millis();
 }
 
 int measure_distance()
@@ -51,43 +49,52 @@ int measure_distance()
   return duration * 0.034 / 2;
 }
 
-void set_hangle(int hangle)
+
+void measure(int hangle)
 {
-  // hangle in degrees
-  // Serial.print("Rotating to");
-  // Serial.print(hangle, DEC);
-  // Serial.println();
-  servoh.write(hangle);
+    Serial.print(hangle);
+    Serial.print(" ");
+    long long start = millis();
+    long cm = measure_distance();
+
+    Serial.print(cm);
+    Serial.print(" ");
+    Serial.print(millis() - global_start);
+    Serial.println();
+    long dt = 50 - (millis() - start);
+    if (dt > 0) delay(dt);
 }
 
+#define ANGLE_LOWER (-75)
+#define ANGLE_UPPER (75)
+int hangle = 75;
+int d = 3;
+
 void loop() {
-  // return;
-  for (int hangle = 0; hangle <= 360; hangle += 10)
+  hangle += d;
+  if (hangle < ANGLE_LOWER || hangle > ANGLE_UPPER)
   {
-    if (hangle >= 180)
-    {
-      set_hangle(360 - hangle);
-      Serial.print(360 - hangle);
-    }
-    else
-    {
-      set_hangle(hangle);
-      Serial.print(hangle);
-    }
+    hangle = constrain(hangle, ANGLE_LOWER, ANGLE_UPPER);
+    d *= -1;
+  }
 
-    int cm = 0;
-    
-    Serial.print(" ");
-    int num = 10;
-    for (int i = 0; i < num; i++)
-      cm += measure_distance();
-
-    Serial.print(cm / num);
-    // Serial.print("cm");
+  set_hangle(90 + hangle);
+  measure(hangle);
+  if (Serial.available())
+  {
+    delay(200);
+    int base_hangle = Serial.read() - 90;
+    base_hangle = constrain(base_hangle, -80, 80);
+    Serial.print("; base angle=");
+    Serial.print(base_hangle, DEC);
     Serial.println();
+    for (int hangle = base_hangle - 10; hangle <= base_hangle + 10; hangle += 1)
+    {
+      set_hangle(90 + hangle);
+      measure(hangle);
+    }
     delay(200);
   }
-  
 }
 
 long microsecondsToCentimeters(long microseconds) {

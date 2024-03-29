@@ -1,0 +1,25 @@
+- make arduino send well formatted data
+	- decide on what to use as a time stamp
+	- send better message
+
+- implement rotation control
+	- on arduino, receive event
+	- on web interface, add buttons
+
+- connect arduino to web server
+	- use socat
+	- might be hard to overpass the IDE's permissions
+
+- web interface visualisation
+	- make points disappear after some time
+		- keep points sorted in the list
+		- every render, remove the first n points that are too old
+	- add slider to control the time
+	- add button to remove all the points
+
+- web interface robot control
+	- DONE design the web interface
+	- button to control the speed
+
+
+- get wifi to work
