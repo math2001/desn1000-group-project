@@ -426,4 +426,5 @@ void loop() {
   {
     handle_input(Serial.read());
   }
+  delay(200);
 }

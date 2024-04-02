@@ -156,9 +156,10 @@ function main()
     const angle = Math.round(Math.atan2(dy, dx) * 180 / Math.PI + 90)
     const sending_angle = 180 - (angle + 90);
     console.log(angle, sending_angle)
-    const buf = new Uint8Array(1)
-    buf[0] = sending_angle
-    ws.send(buf)
+    // const buf = new Uint8Array(1)
+    // buf[0] = sending_angle
+    // ws.send(buf)
+    ws.send("s" + (sending_angle.toString()) + ".")
   })
   
   let points: Point[] = []
