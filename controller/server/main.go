@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"flag"
-	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -108,7 +107,6 @@ func handleWebClient(ws *websocket.Conn) {
 
 	for {
 		_, msg, err := ws.ReadMessage()
-		fmt.Println("got message")
 		if err != nil {
 			log.Printf("web client read error: %s", err)
 			webClientsLock.Lock()

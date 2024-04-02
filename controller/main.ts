@@ -127,6 +127,55 @@ function render(points: Point[], ctx: CanvasRenderingContext2D, config: Config)
   requestAnimationFrame(() => render(points, ctx, config))
 }
 
+function add_movement_controller(ws: WebSocket)
+{
+  const FORWARD = 'f';
+  const BACKWARDS = 'b';
+  const TURN_LEFT = 'l';
+  const TURN_RIGHT = 'r';
+  const SLIDE_LEFT = 'L';
+  const SLIDE_RIGHT = 'R';
+  const STOP = '0';
+
+  document.body.addEventListener('keydown', e => {
+    // e.repeat doesn't work on firefox for some reason
+    if (e.repeat) {
+      return;
+    }
+    console.log(e.key)
+    if (e.key == 'w') {
+      ws.send(FORWARD);
+    } else if (e.key == 's') {
+      ws.send(BACKWARDS);
+    } else if (e.key == 'a') {
+      ws.send(SLIDE_LEFT);
+    } else if (e.key == 'd') {
+      ws.send(SLIDE_RIGHT);
+    } else if (e.key == 'ArrowRight') {
+      ws.send(TURN_RIGHT);
+    } else if (e.key == 'ArrowLeft') {
+      ws.send(TURN_LEFT);
+    } else if (e.key == '0' || e.key == '1' || e.key == '2' || e.key == '3' || e.key == '4' || e.key == '5') {
+      ws.send(e.key)
+    }
+  })
+  document.body.addEventListener('keyup', e => {
+    if (e.key == 'w') {
+      ws.send(STOP);
+    } else if (e.key == 's') {
+      ws.send(STOP);
+    } else if (e.key == 'a') {
+      ws.send(STOP);
+    } else if (e.key == 'd') {
+      ws.send(STOP);
+    } else if (e.key == 'ArrowRight') {
+      ws.send(STOP);
+    } else if (e.key == 'ArrowLeft') {
+      ws.send(STOP);
+    }
+  })
+}
+
 function main()
 {
   document.body.addEventListener('mousemove', e => {
@@ -161,6 +210,8 @@ function main()
     // ws.send(buf)
     ws.send("s" + (sending_angle.toString()) + ".")
   })
+
+  add_movement_controller(ws)
   
   let points: Point[] = []
 
