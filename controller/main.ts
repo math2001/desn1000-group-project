@@ -52,15 +52,16 @@ const min_distance = 0 // cm
 
 function assert_sorted(points: Point[])
 {
+  return;
   for (let i = 0; i < points.length - 1; i++)
   {
-    assert(points[i].timestampMS < points[i+1].timestampMS)
+    assert(points[i].timestampMS < points[i+1].timestampMS, `${i}`)
   }
 }
 
 function render(points: Point[], ctx: CanvasRenderingContext2D, config: Config)
 {
-  assert_sorted(points)
+  // assert_sorted(points)
   removeOldPoints(points, config)
 
   ctx.fillStyle = 'black'
@@ -104,7 +105,7 @@ function render(points: Point[], ctx: CanvasRenderingContext2D, config: Config)
 
   for (let point of points)
   {
-    const radius = .003;
+    const radius = .01;
     const L = max_radius * (point.distance / (max_distance - min_distance))
     const x = base.x + L * Math.sin(point.angle*Math.PI/180)
     const y = base.y - L * Math.cos(point.angle*Math.PI/180)

@@ -1,3 +1,7 @@
+// good resources:
+// https://cgrant.medium.com/using-the-esp8266-wifi-module-with-arduino-uno-publishing-to-thingspeak-99fc77122e82
+// https://www.taydaelectronics.com/datasheets/files/ESP-01S.pdf
+
 #include <Servo.h>
 #include <SPI.h>
 #include <WiFi.h>

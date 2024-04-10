@@ -1,24 +1,25 @@
 #include <Servo.h>
+// #define COMMENT true
 
 // TODO: fix up pin numbers (right now they overlap/go to zero)
 
-#define PIN_ULTR_TRIG 9
-#define PIN_ULTR_ECHO 10
+#define PIN_ULTR_TRIG 51
+#define PIN_ULTR_ECHO 53
 #define PIN_LED 13
-#define PIN_HSERVO 11
+#define PIN_HSERVO 49
 
 // no enable pins
-#define MOTOR_FRONT_LEFT_1 10
-#define MOTOR_FRONT_LEFT_2 11
+#define MOTOR_FRONT_LEFT_1 4
+#define MOTOR_FRONT_LEFT_2 5
 
-#define MOTOR_FRONT_RIGHT_1 9
+#define MOTOR_FRONT_RIGHT_1 2
 #define MOTOR_FRONT_RIGHT_2 3
 
-#define MOTOR_BACK_LEFT_1 0
-#define MOTOR_BACK_LEFT_2 0
+#define MOTOR_BACK_LEFT_1 9
+#define MOTOR_BACK_LEFT_2 8
 
-#define MOTOR_BACK_RIGHT_1 0
-#define MOTOR_BACK_RIGHT_2 0
+#define MOTOR_BACK_RIGHT_1 7
+#define MOTOR_BACK_RIGHT_2 6
 
 // movement types
 #define MOVEMENT_STOP 0
@@ -31,7 +32,7 @@
 
 Servo servoh;
 
-int speed_percentage = 50;
+int speed_percentage = 100;
 int movement = MOVEMENT_STOP;
 
 // hangle must be in degrees, between 0 and 180
@@ -50,61 +51,6 @@ void set_hangle(int hangle)
 // before 49 days. Otherwise we might get unlucky and wrap during our run!
 unsigned long global_start = 0;
 
-void setup() {
-  Serial.begin(9600);
-  pinMode(PIN_LED, 13);
-  servoh.attach(PIN_HSERVO);
-
-  Serial.print("PIN_ULTR_TRIG=");
-  Serial.println(PIN_ULTR_TRIG, DEC);
-  pinMode(PIN_ULTR_TRIG, OUTPUT);
-  Serial.print("PIN_ULTR_ECHO=");
-  Serial.println(PIN_ULTR_ECHO, DEC);
-  pinMode(PIN_ULTR_ECHO, INPUT);
-
-  Serial.print("MOTOR_FRONT_LEFT_1=");
-  Serial.println(MOTOR_FRONT_LEFT_1, DEC);
-  Serial.print("MOTOR_FRONT_LEFT_2=");
-  Serial.println(MOTOR_FRONT_LEFT_2, DEC);
-
-  Serial.print("MOTOR_FRONT_RIGHT_1=");
-  Serial.println(MOTOR_FRONT_RIGHT_1, DEC);
-  Serial.print("MOTOR_FRONT_RIGHT_2=");
-  Serial.println(MOTOR_FRONT_RIGHT_2, DEC);
-
-  Serial.print("Initialising the motors... ");
-  pinMode(MOTOR_FRONT_LEFT_1, OUTPUT);
-  pinMode(MOTOR_FRONT_LEFT_2, OUTPUT);
-  pinMode(MOTOR_FRONT_RIGHT_1, OUTPUT);
-  pinMode(MOTOR_FRONT_RIGHT_2, OUTPUT);
-  Serial.println("Done");
-
-  pinMode(MOTOR_BACK_LEFT_1, OUTPUT);
-  pinMode(MOTOR_BACK_LEFT_2, OUTPUT);
-  pinMode(MOTOR_BACK_RIGHT_1, OUTPUT);
-  pinMode(MOTOR_BACK_RIGHT_2, OUTPUT);
-
-  Serial.print("Turning everything off... ");
-  digitalWrite(MOTOR_FRONT_LEFT_1, LOW);
-  digitalWrite(MOTOR_FRONT_LEFT_2, LOW);
-  digitalWrite(MOTOR_FRONT_RIGHT_1, LOW);
-  digitalWrite(MOTOR_FRONT_RIGHT_2, LOW);
-
-  digitalWrite(MOTOR_BACK_LEFT_1, LOW);
-  digitalWrite(MOTOR_BACK_LEFT_2, LOW);
-  digitalWrite(MOTOR_BACK_RIGHT_1, LOW);
-  digitalWrite(MOTOR_BACK_RIGHT_2, LOW);
-  Serial.println("Done");
-
-  Serial.println("Initialisation done");
-
-  set_hangle(0);
-  delay(1000);
-
-  Serial.println("Ready");
-
-  global_start = millis();
-}
 
 int measure_distance()
 {
@@ -151,96 +97,120 @@ void front_left_forwards()
 {
   analogWrite(MOTOR_FRONT_LEFT_1, speed_percentage * 255 / 100);
   digitalWrite(MOTOR_FRONT_LEFT_2, LOW);
-  Serial.print("  => motor front left pin 1: ");
+  #ifdef COMMENT
+  Serial.print(";  => motor front left pin 1: ");
   Serial.print(speed_percentage * 255 / 100, DEC);
-  Serial.println("  motor front left pin 2: LOW");
+  Serial.println(";  motor front left pin 2: LOW");
+  #endif
 }
 
 void front_left_backwards()
 {
   digitalWrite(MOTOR_FRONT_LEFT_1, LOW);
   analogWrite(MOTOR_FRONT_LEFT_2, speed_percentage * 255 / 100);
-  Serial.print("  => motor front left pin 1: LOW   motor front left pin 2: ");
+  #ifdef COMMENT
+  Serial.print(";  => motor front left pin 1: LOW   motor front left pin 2: ");
   Serial.println(speed_percentage * 255 / 100, DEC);
+  #endif
 }
 
 void front_left_stop()
 {
   digitalWrite(MOTOR_FRONT_LEFT_1, LOW);
   digitalWrite(MOTOR_FRONT_LEFT_2, LOW);
-  Serial.println("  => motor front left pin 1: LOW   motor front left pin 2: LOW");
+  #ifdef COMMENT
+  Serial.println(";  => motor front left pin 1: LOW   motor front left pin 2: LOW");
+  #endif
 }
 
 void front_right_forwards()
 {
   analogWrite(MOTOR_FRONT_RIGHT_1, speed_percentage * 255 / 100);
   digitalWrite(MOTOR_FRONT_RIGHT_2, LOW);
-  Serial.print("  => motor front right pin 1: ");
+  #ifdef COMMENT
+  Serial.print(";  => motor front right pin 1: ");
   Serial.print(speed_percentage * 255 / 100, DEC);
   Serial.println("  motor front right pin 2: LOW");
+  #endif
 }
 
 void front_right_backwards()
 {
   digitalWrite(MOTOR_FRONT_RIGHT_1, LOW);
   analogWrite(MOTOR_FRONT_RIGHT_2, speed_percentage * 255 / 100);
-  Serial.print("  => motor front right pin 1: LOW   motor front right pin 2: ");
+  #ifdef COMMENT
+  Serial.print(";  => motor front right pin 1: LOW   motor front right pin 2: ");
   Serial.println(speed_percentage * 255 / 100, DEC);
+  #endif
 }
 
 void front_right_stop()
 {
   digitalWrite(MOTOR_FRONT_RIGHT_1, LOW);
   digitalWrite(MOTOR_FRONT_RIGHT_2, LOW);
-  Serial.println("  => motor front right pin 1: LOW   motor front right pin 2: LOW");
+  #ifdef COMMENT
+    Serial.println(";  => motor front right pin 1: LOW   motor front right pin 2: LOW");
+  #endif
 }
 
 void back_left_forwards()
 {
   analogWrite(MOTOR_BACK_LEFT_1, speed_percentage * 255 / 100);
   digitalWrite(MOTOR_BACK_LEFT_2, LOW);
-  Serial.print("  => motor back left pin 1: ");
+  #ifdef COMMENT
+  Serial.print(";  => motor back left pin 1: ");
   Serial.print(speed_percentage * 255 / 100, DEC);
   Serial.println("  motor back left pin 2: LOW");
+  #endif
 }
 
 void back_left_backwards()
 {
   digitalWrite(MOTOR_BACK_LEFT_1, LOW);
   analogWrite(MOTOR_BACK_LEFT_2, speed_percentage * 255 / 100);
-  Serial.print("  => motor back left pin 1: LOW   motor back left pin 2: ");
+  #ifdef COMMENT
+  Serial.print(";  => motor back left pin 1: LOW   motor back left pin 2: ");
   Serial.println(speed_percentage * 255 / 100, DEC);
+  #endif
 }
 
 void back_left_stop()
 {
   digitalWrite(MOTOR_BACK_LEFT_1, LOW);
   digitalWrite(MOTOR_BACK_LEFT_2, LOW);
-  Serial.println("  => motor back left pin 1: LOW   motor back left pin 2: LOW");
+  #ifdef COMMENT
+  Serial.println(";  => motor back left pin 1: LOW   motor back left pin 2: LOW");
+  #endif
 }
 
 void back_right_forwards()
 {
   analogWrite(MOTOR_BACK_RIGHT_1, speed_percentage * 255 / 100);
   digitalWrite(MOTOR_BACK_RIGHT_2, LOW);
-  Serial.print("  => motor back right pin 1: ");
+  #ifdef COMMENT
+  Serial.print(";  => motor back right pin 1: ");
   Serial.print(speed_percentage * 255 / 100, DEC);
   Serial.println("  motor back right pin 2: LOW");
+  #endif
 }
 
 void back_right_backwards()
 {
   digitalWrite(MOTOR_BACK_RIGHT_1, LOW);
   analogWrite(MOTOR_BACK_RIGHT_2, speed_percentage * 255 / 100);
-  Serial.print("  => motor back right pin 1: LOW   motor back right pin 2: ");
+  #ifdef COMMENT
+  Serial.print(";  => motor back right pin 1: LOW   motor back right pin 2: ");
   Serial.println(speed_percentage * 255 / 100, DEC);
+  #endif
 }
 
 void back_right_stop()
 {
   digitalWrite(MOTOR_BACK_RIGHT_1, LOW);
   digitalWrite(MOTOR_BACK_RIGHT_2, LOW);
-  Serial.println("  => motor back right pin 1: LOW   motor back right pin 2: LOW");
+  #ifdef COMMENT
+  Serial.println(";  => motor back right pin 1: LOW   motor back right pin 2: LOW");
+  #endif
 }
 
 void implement_movement()
@@ -411,8 +381,73 @@ void handle_input(int byte)
     implement_movement();
 }
 
-void loop() {
+void setup() {
+  Serial.begin(9600);
+  pinMode(PIN_LED, 13);
+  servoh.attach(PIN_HSERVO);
 
+  Serial.print("PIN_ULTR_TRIG=");
+  Serial.println(PIN_ULTR_TRIG, DEC);
+  pinMode(PIN_ULTR_TRIG, OUTPUT);
+  Serial.print("PIN_ULTR_ECHO=");
+  Serial.println(PIN_ULTR_ECHO, DEC);
+  pinMode(PIN_ULTR_ECHO, INPUT);
+
+  Serial.print("MOTOR_FRONT_LEFT_1=");
+  Serial.println(MOTOR_FRONT_LEFT_1, DEC);
+  Serial.print("MOTOR_FRONT_LEFT_2=");
+  Serial.println(MOTOR_FRONT_LEFT_2, DEC);
+
+  Serial.print("MOTOR_FRONT_RIGHT_1=");
+  Serial.println(MOTOR_FRONT_RIGHT_1, DEC);
+  Serial.print("MOTOR_FRONT_RIGHT_2=");
+  Serial.println(MOTOR_FRONT_RIGHT_2, DEC);
+
+  Serial.print("Initialising the motors... ");
+  pinMode(MOTOR_FRONT_LEFT_1, OUTPUT);
+  pinMode(MOTOR_FRONT_LEFT_2, OUTPUT);
+  pinMode(MOTOR_FRONT_RIGHT_1, OUTPUT);
+  pinMode(MOTOR_FRONT_RIGHT_2, OUTPUT);
+  Serial.println("Done");
+
+  pinMode(MOTOR_BACK_LEFT_1, OUTPUT);
+  pinMode(MOTOR_BACK_LEFT_2, OUTPUT);
+  pinMode(MOTOR_BACK_RIGHT_1, OUTPUT);
+  pinMode(MOTOR_BACK_RIGHT_2, OUTPUT);
+
+  Serial.print("Turning everything off... ");
+  digitalWrite(MOTOR_FRONT_LEFT_1, LOW);
+  digitalWrite(MOTOR_FRONT_LEFT_2, LOW);
+  digitalWrite(MOTOR_FRONT_RIGHT_1, LOW);
+  digitalWrite(MOTOR_FRONT_RIGHT_2, LOW);
+
+  digitalWrite(MOTOR_BACK_LEFT_1, LOW);
+  digitalWrite(MOTOR_BACK_LEFT_2, LOW);
+  digitalWrite(MOTOR_BACK_RIGHT_1, LOW);
+  digitalWrite(MOTOR_BACK_RIGHT_2, LOW);
+  Serial.println("Done");
+
+  Serial.println("Initialisation done");
+
+  set_hangle(0);
+  delay(1000);
+
+  Serial.println("Ready");
+
+  global_start = millis();
+
+  servoh.write(0);
+
+  // digitalWrite(MOTOR_FRONT_LEFT_1, HIGH);
+  // digitalWrite(MOTOR_FRONT_LEFT_2, LOW);
+  // front_left_forwards();
+  // front_right_forwards();
+  // back_left_forwards();
+  // back_right_forwards();
+
+}
+void loop() {
+  // return;
   hangle += d;
   if (hangle < ANGLE_LOWER || hangle > ANGLE_UPPER)
   {
