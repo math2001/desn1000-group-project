@@ -98,7 +98,7 @@ function render(points, ctx, config) {
     ctx.restore();
     requestAnimationFrame(() => render(points, ctx, config));
 }
-function add_movement_controller(ws) {
+function add_movement_controller(ws, slowMode, observe) {
     const FORWARD = 'f';
     const BACKWARDS = 'b';
     const TURN_LEFT = 'l';
@@ -130,8 +130,16 @@ function add_movement_controller(ws) {
         else if (e.key == 'ArrowLeft') {
             ws.send(TURN_LEFT);
         }
-        else if (e.key == '0' || e.key == '1' || e.key == '2' || e.key == '3' || e.key == '4' || e.key == '5') {
+        else if (e.key == '0' || e.key == '1' || e.key == '2' || e.key == '3' || e.key == '4' || e.key == '5' || e.key == '6' || e.key == '7' || e.key == '8' || e.key == '9') {
             ws.send(e.key);
+        }
+        else if (e.key == 'm') {
+            slowMode.checked = !slowMode.checked;
+            slowMode.dispatchEvent(new Event('change'));
+        }
+        else if (e.key == 'o') {
+            observe.checked = !observe.checked;
+            observe.dispatchEvent(new Event('change'));
         }
     });
     document.body.addEventListener('keyup', e => {
@@ -166,6 +174,8 @@ function main() {
     assert(!!ctx);
     const slowMode = document.querySelector("#slow-mode");
     assert(!!slowMode);
+    const observe = document.querySelector("#scanning");
+    assert(!!observe);
     s = scalingFactor(ctx);
     const ws = new WebSocket('ws://localhost:8080/ws');
     assert(!!ws);
@@ -188,20 +198,19 @@ function main() {
     slowMode.addEventListener('change', e => {
         ws.send('m');
     });
-    add_movement_controller(ws);
+    observe.addEventListener('change', () => {
+        ws.send('o');
+    });
+    add_movement_controller(ws, slowMode, observe);
     let points = [];
     ws.addEventListener('message', (e) => {
         const msg = e.data;
         if (msg.startsWith(';')) {
             if (msg == '; reset') {
                 slowMode.checked = false;
+                points.splice(0, points.length);
             }
             console.info("Received comment", msg);
-            return;
-        }
-        else if (msg == 'reset') {
-            console.info("reset");
-            points.splice(0, points.length);
             return;
         }
         let [angle, distance, timestampMS] = msg.trim().split(' ').map(parseFloat);

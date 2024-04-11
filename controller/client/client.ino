@@ -35,6 +35,7 @@ Servo servoh;
 int speed_percentage = 100;
 int movement = MOVEMENT_STOP;
 bool slow_mode = false;
+bool observe = false;
 
 // hangle must be in degrees, between 0 and 180
 void set_hangle(int hangle)
@@ -302,37 +303,30 @@ void handle_input(int byte)
     if (byte == 'f')
     {
         movement = MOVEMENT_FORWARDS;
-        Serial.println("Forwards");
     }
     else if (byte == 'b')
     {
         movement = MOVEMENT_BACKWARDS;
-        Serial.println("Backwards");
     }
     else if (byte == 'l')
     {
         movement = MOVEMENT_TURN_LEFT;
-        Serial.println("Turn Left");
     }
     else if (byte == 'r')
     {
         movement = MOVEMENT_TURN_RIGHT;
-        Serial.println("Turn Right");
     }
     else if (byte == 'L')
     {
         movement = MOVEMENT_SLIDE_LEFT;
-        Serial.println("Slide Left");
     }
     else if (byte == 'R')
     {
         movement = MOVEMENT_SLIDE_RIGHT;
-        Serial.println("Slide Right");
     }
     else if (byte == '0')
     {
         movement = MOVEMENT_STOP;
-        Serial.println("Stop");
     }
     else if ('1' <= byte && byte <= '5')
     {
@@ -374,6 +368,21 @@ void handle_input(int byte)
     else if (byte == 'm')
     {
       slow_mode = !slow_mode;
+    }
+    else if (byte == 'o')
+    {
+      Serial.println("; start observing");
+      if (observe)
+      {
+        observe = false;
+        hangle = 0;
+        set_hangle(90 + hangle);
+      }
+      else
+      {
+        observe = true;
+        hangle = 75;
+      }
     }
     else
     {
@@ -453,6 +462,12 @@ void setup() {
   Serial.println("; reset");
   #endif
 
+  observe = false;
+  slow_mode = false;
+
+
+  Serial.println("; hello world");
+
   // digitalWrite(MOTOR_FRONT_LEFT_1, HIGH);
   // digitalWrite(MOTOR_FRONT_LEFT_2, LOW);
   // front_left_forwards();
@@ -462,15 +477,17 @@ void setup() {
 
 }
 void loop() {
-  // return;
-  hangle += d;
-  if (hangle < ANGLE_LOWER || hangle > ANGLE_UPPER)
+  if (observe)
   {
-    hangle = constrain(hangle, ANGLE_LOWER, ANGLE_UPPER);
-    d *= -1;
+    hangle += d;
+    if (hangle < ANGLE_LOWER || hangle > ANGLE_UPPER)
+    {
+      hangle = constrain(hangle, ANGLE_LOWER, ANGLE_UPPER);
+      d *= -1;
+    }
+    set_hangle(90 + hangle);
   }
 
-  set_hangle(90 + hangle);
   measure(hangle);
   if (Serial.available())
   {
