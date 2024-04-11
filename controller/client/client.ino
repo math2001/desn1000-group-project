@@ -1,5 +1,5 @@
 #include <Servo.h>
-// #define COMMENT true
+// #define COMMENT false
 
 // TODO: fix up pin numbers (right now they overlap/go to zero)
 
@@ -34,6 +34,7 @@ Servo servoh;
 
 int speed_percentage = 100;
 int movement = MOVEMENT_STOP;
+bool slow_mode = false;
 
 // hangle must be in degrees, between 0 and 180
 void set_hangle(int hangle)
@@ -370,6 +371,10 @@ void handle_input(int byte)
             delay(200);
         }
     }
+    else if (byte == 'm')
+    {
+      slow_mode = !slow_mode;
+    }
     else
     {
         Serial.print("Unknown command '");
@@ -379,6 +384,12 @@ void handle_input(int byte)
     }
 
     implement_movement();
+    if (slow_mode)
+    {
+      delay(100);
+      movement = MOVEMENT_STOP;
+      implement_movement();
+    }
 }
 
 void setup() {
@@ -437,6 +448,10 @@ void setup() {
   global_start = millis();
 
   servoh.write(0);
+
+  #ifdef COMMENT
+  Serial.println("; reset");
+  #endif
 
   // digitalWrite(MOTOR_FRONT_LEFT_1, HIGH);
   // digitalWrite(MOTOR_FRONT_LEFT_2, LOW);

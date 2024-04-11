@@ -164,6 +164,8 @@ function main() {
     assert(!!canvas);
     const ctx = canvas.getContext('2d');
     assert(!!ctx);
+    const slowMode = document.querySelector("#slow-mode");
+    assert(!!slowMode);
     s = scalingFactor(ctx);
     const ws = new WebSocket('ws://localhost:8080/ws');
     assert(!!ws);
@@ -183,11 +185,17 @@ function main() {
         // ws.send(buf)
         ws.send("s" + (sending_angle.toString()) + ".");
     });
+    slowMode.addEventListener('change', e => {
+        ws.send('m');
+    });
     add_movement_controller(ws);
     let points = [];
     ws.addEventListener('message', (e) => {
         const msg = e.data;
         if (msg.startsWith(';')) {
+            if (msg == '; reset') {
+                slowMode.checked = false;
+            }
             console.info("Received comment", msg);
             return;
         }
@@ -207,4 +215,6 @@ function main() {
     render(points, ctx, config);
 }
 const config = { remove_points_after_ms: 2 * 1000 };
-main();
+document.addEventListener("DOMContentLoaded", () => {
+    main();
+});

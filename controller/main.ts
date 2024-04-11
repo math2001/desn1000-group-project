@@ -190,6 +190,9 @@ function main()
   const ctx = canvas.getContext('2d');
   assert(!!ctx);
 
+  const slowMode = document.querySelector("#slow-mode") as HTMLInputElement;
+  assert(!!slowMode);
+
   s = scalingFactor(ctx)
 
   const ws = new WebSocket('ws://localhost:8080/ws')
@@ -212,6 +215,10 @@ function main()
     ws.send("s" + (sending_angle.toString()) + ".")
   })
 
+  slowMode.addEventListener('change', e => {
+    ws.send('m')
+  })
+
   add_movement_controller(ws)
   
   let points: Point[] = []
@@ -220,6 +227,9 @@ function main()
     const msg: string = e.data
     if (msg.startsWith(';'))
     {
+      if (msg == '; reset') {
+        slowMode.checked = false;
+      }
       console.info("Received comment", msg);
       return;
     }
@@ -243,4 +253,6 @@ function main()
 
 const config: Config = {remove_points_after_ms: 2 * 1000}
 
-main()
+document.addEventListener("DOMContentLoaded", () => {
+  main()
+})
