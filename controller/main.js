@@ -1,4 +1,8 @@
 "use strict";
+let clawAngleVal = 0;
+const CLAW_ANGLE_MIN = 0;
+const CLAW_ANGLE_MAX = 90;
+const CLAW_ANGLE_DELTA = 15;
 function assert(cond, msg) {
     if (!cond)
         throw new Error("assertion error: " + (msg || ""));
@@ -98,7 +102,7 @@ function render(points, ctx, config) {
     ctx.restore();
     requestAnimationFrame(() => render(points, ctx, config));
 }
-function add_movement_controller(ws, slowMode, observe) {
+function add_movement_controller(ws, slowMode, observe, clawAngle) {
     const FORWARD = 'f';
     const BACKWARDS = 'b';
     const TURN_LEFT = 'l';
@@ -141,6 +145,22 @@ function add_movement_controller(ws, slowMode, observe) {
             observe.checked = !observe.checked;
             observe.dispatchEvent(new Event('change'));
         }
+        else if (e.key == 'c') {
+            clawAngleVal -= CLAW_ANGLE_DELTA;
+            if (clawAngleVal < CLAW_ANGLE_MIN) {
+                clawAngleVal = CLAW_ANGLE_MIN;
+            }
+            ws.send("c" + (clawAngleVal.toString()) + ".");
+            clawAngle.textContent = clawAngleVal.toString();
+        }
+        else if (e.key == 'C') {
+            clawAngleVal += CLAW_ANGLE_DELTA;
+            if (CLAW_ANGLE_MAX < clawAngleVal) {
+                clawAngleVal = CLAW_ANGLE_MAX;
+            }
+            ws.send("c" + (clawAngleVal.toString()) + ".");
+            clawAngle.textContent = clawAngleVal.toString();
+        }
     });
     document.body.addEventListener('keyup', e => {
         if (e.key == 'w') {
@@ -177,6 +197,8 @@ function main() {
     const observe = document.querySelector("#scanning");
     assert(!!observe);
     s = scalingFactor(ctx);
+    const clawAngle = document.querySelector("#claw-angle");
+    assert(!!clawAngle);
     const ws = new WebSocket('ws://localhost:8080/ws');
     assert(!!ws);
     ws.addEventListener('open', () => {
@@ -201,13 +223,18 @@ function main() {
     observe.addEventListener('change', () => {
         ws.send('o');
     });
-    add_movement_controller(ws, slowMode, observe);
+    add_movement_controller(ws, slowMode, observe, clawAngle);
     let points = [];
     ws.addEventListener('message', (e) => {
         const msg = e.data;
         if (msg.startsWith(';')) {
             if (msg == '; reset') {
                 slowMode.checked = false;
+                observe.checked = false;
+                slowMode.dispatchEvent(new Event('change'));
+                observe.dispatchEvent(new Event('change'));
+                clawAngle.textContent = '0';
+                clawAngleVal = 0;
                 points.splice(0, points.length);
             }
             console.info("Received comment", msg);
@@ -219,6 +246,7 @@ function main() {
         points.push({ angle, distance, timestampMS });
         // console.log("new point", msg, points.length)
     });
+    clawAngle.textContent = clawAngleVal.toString();
     // points = data.split('\n').map(s => s.trim().split(' ').map(parseFloat)).map(([angle, distance, timestampMS]) => {return {angle, distance, timestampMS}})
     // points = points.map(({angle, distance, timestampMS}) => { return {angle, distance: 300, timestampMS}})
     render(points, ctx, config);

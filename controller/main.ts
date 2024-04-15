@@ -1,6 +1,11 @@
 type Vec2 = {x: number, y: number}
 type Point = {angle: number, distance: number, timestampMS: number}
 
+let clawAngleVal: number = 0;
+const CLAW_ANGLE_MIN = 0
+const CLAW_ANGLE_MAX = 90
+const CLAW_ANGLE_DELTA = 15
+
 function assert(cond: boolean, msg?: string): asserts cond
 {
   if (!cond)
@@ -128,7 +133,7 @@ function render(points: Point[], ctx: CanvasRenderingContext2D, config: Config)
   requestAnimationFrame(() => render(points, ctx, config))
 }
 
-function add_movement_controller(ws: WebSocket, slowMode: HTMLInputElement, observe: HTMLInputElement)
+function add_movement_controller(ws: WebSocket, slowMode: HTMLInputElement, observe: HTMLInputElement, clawAngle: HTMLElement)
 {
   const FORWARD = 'f';
   const BACKWARDS = 'b';
@@ -164,6 +169,22 @@ function add_movement_controller(ws: WebSocket, slowMode: HTMLInputElement, obse
     } else if (e.key == 'o') {
       observe.checked = !observe.checked;
       observe.dispatchEvent(new Event('change'))
+    } else if (e.key == 'c') {
+      clawAngleVal -= CLAW_ANGLE_DELTA;
+      if (clawAngleVal < CLAW_ANGLE_MIN)
+      {
+        clawAngleVal = CLAW_ANGLE_MIN;
+      }
+      ws.send("c" + (clawAngleVal.toString()) + ".")
+      clawAngle.textContent = clawAngleVal.toString()
+    } else if (e.key == 'C') {
+      clawAngleVal += CLAW_ANGLE_DELTA;
+      if (CLAW_ANGLE_MAX < clawAngleVal)
+      {
+        clawAngleVal = CLAW_ANGLE_MAX;
+      }
+      ws.send("c" + (clawAngleVal.toString()) + ".")
+      clawAngle.textContent = clawAngleVal.toString()
     }
   })
 
@@ -205,6 +226,9 @@ function main()
 
   s = scalingFactor(ctx)
 
+  const clawAngle = document.querySelector("#claw-angle") as HTMLInputElement;
+  assert(!!clawAngle);
+
   const ws = new WebSocket('ws://localhost:8080/ws')
   assert(!!ws);
   ws.addEventListener('open', () => {
@@ -233,7 +257,7 @@ function main()
     ws.send('o');
   })
 
-  add_movement_controller(ws, slowMode, observe)
+  add_movement_controller(ws, slowMode, observe, clawAngle)
   
   let points: Point[] = []
 
@@ -243,6 +267,11 @@ function main()
     {
       if (msg == '; reset') {
         slowMode.checked = false;
+        observe.checked = false;
+        slowMode.dispatchEvent(new Event('change'))
+        observe.dispatchEvent(new Event('change'))
+        clawAngle.textContent = '0'
+        clawAngleVal = 0
         points.splice(0, points.length);
       }
       console.info("Received comment", msg);
@@ -254,6 +283,8 @@ function main()
     points.push({angle, distance, timestampMS})
     // console.log("new point", msg, points.length)
   })
+
+  clawAngle.textContent = clawAngleVal.toString()
   
   // points = data.split('\n').map(s => s.trim().split(' ').map(parseFloat)).map(([angle, distance, timestampMS]) => {return {angle, distance, timestampMS}})
   // points = points.map(({angle, distance, timestampMS}) => { return {angle, distance: 300, timestampMS}})

@@ -7,20 +7,33 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <canvas width="960" height="960"></canvas>
+    <canvas width="900" height="900"></canvas>
+    <div class="details">
+        <p>
+            <input type="checkbox" id="slow-mode" /> <label for="slow-mode">Slow mode</label>
+        </p>
+        <p>
+            <input type="checkbox" id="scanning" /> <label for="scanning">Scanning</label>
+        </p>
+        <p>
+            Claw angle:
+            <span id="claw-angle">[claw angle loading]</span> deg
+        </p>
+        <hr>
+        <p>
+            Keyboard control:
+        </p>
+        <ul>
+            <li><code>w</code>: forward</li>
+            <li><code>s</code>: backwards</li>
+            <li><code>d</code>: slide right</li>
+            <li><code>a</code>: slide left</li>
+            <li><code>left arrow</code>: turn left</li>
+            <li><code>right arrow</code>: turn right</li>
+            <li><code>c</code> close the claw</li>
+            <li><code>C</code> open the claw</li>
+        </ul>
+    </div>
     <script type="text/javascript" src="main.js"></script>
-    <input type="checkbox" id="slow-mode" /> <label for="slow-mode">Slow mode</label>
-    <input type="checkbox" id="scanning" /> <label for="scanning">Scanning</label>
-    <p>
-        Keyboard control:
-    </p>
-    <ul>
-        <li><code>w</code>: forward</li>
-        <li><code>s</code>: backwards</li>
-        <li><code>d</code>: slide right</li>
-        <li><code>a</code>: slide left</li>
-        <li><code>left arrow</code>: turn left</li>
-        <li><code>right arrow</code>: turn right</li>
-    </ul>
 </body>
 </html>

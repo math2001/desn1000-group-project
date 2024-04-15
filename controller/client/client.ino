@@ -7,6 +7,7 @@
 #define PIN_ULTR_ECHO 53
 #define PIN_LED 13
 #define PIN_HSERVO 49
+#define PIN_CLAW 46
 
 // no enable pins
 #define MOTOR_FRONT_LEFT_1 4
@@ -30,7 +31,8 @@
 #define MOVEMENT_SLIDE_LEFT 5
 #define MOVEMENT_SLIDE_RIGHT 6
 
-Servo servoh;
+Servo servo_camera;
+Servo servo_claw;
 
 int speed_percentage = 100;
 int movement = MOVEMENT_STOP;
@@ -46,7 +48,7 @@ void set_hangle(int hangle)
   /* Serial.println(); */
   hangle = constrain(hangle, 0, 180);
 
-  servoh.write(hangle);
+  servo_camera.write(hangle);
 }
 
 // the reason we use a global start is so that we know we won't wrap around
@@ -86,6 +88,12 @@ void measure(int hangle)
 #define ANGLE_UPPER (75)
 int hangle = 75;
 int d = 3;
+
+#define CLAW_ANGLE_MIN (0)  // closed
+#define CLAW_ANGLE_MAX (90) // wide open
+#define CLAW_ANGLE_DELTA (2)
+// moves between -90 and 90
+int claw_angle = 0;
 
 
 long microsecondsToCentimeters(long microseconds) {
@@ -213,6 +221,11 @@ void back_right_stop()
   #ifdef COMMENT
   Serial.println(";  => motor back right pin 1: LOW   motor back right pin 2: LOW");
   #endif
+}
+
+void implement_claw()
+{
+  servo_claw.write(claw_angle);
 }
 
 void implement_movement()
@@ -384,6 +397,19 @@ void handle_input(int byte)
         hangle = 75;
       }
     }
+    else if (byte == 'c')
+    {
+      int claw_angle = read_int_till_dot();
+      if (claw_angle < CLAW_ANGLE_MIN)
+      {
+        claw_angle = CLAW_ANGLE_MIN;
+      }
+      if (claw_angle > CLAW_ANGLE_MAX)
+      {
+        claw_angle = CLAW_ANGLE_MAX;
+      }
+      servo_claw.write(claw_angle);
+    }
     else
     {
         Serial.print("Unknown command '");
@@ -404,7 +430,8 @@ void handle_input(int byte)
 void setup() {
   Serial.begin(9600);
   pinMode(PIN_LED, 13);
-  servoh.attach(PIN_HSERVO);
+  servo_camera.attach(PIN_HSERVO);
+  servo_claw.attach(PIN_CLAW);
 
   Serial.print("PIN_ULTR_TRIG=");
   Serial.println(PIN_ULTR_TRIG, DEC);
@@ -456,7 +483,7 @@ void setup() {
 
   global_start = millis();
 
-  servoh.write(0);
+  servo_camera.write(0);
 
   #ifdef COMMENT
   Serial.println("; reset");
