@@ -185,6 +185,10 @@ function add_movement_controller(ws: WebSocket, slowMode: HTMLInputElement, obse
       }
       ws.send("c" + (clawAngleVal.toString()) + ".")
       clawAngle.textContent = clawAngleVal.toString()
+    } else if (e.key == 'i') {
+      ws.send('i');
+    } else if (e.key == 'k') {
+      ws.send('k');
     }
   })
 

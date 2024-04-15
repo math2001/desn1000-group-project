@@ -161,6 +161,12 @@ function add_movement_controller(ws, slowMode, observe, clawAngle) {
             ws.send("c" + (clawAngleVal.toString()) + ".");
             clawAngle.textContent = clawAngleVal.toString();
         }
+        else if (e.key == 'i') {
+            ws.send('i');
+        }
+        else if (e.key == 'k') {
+            ws.send('k');
+        }
     });
     document.body.addEventListener('keyup', e => {
         if (e.key == 'w') {

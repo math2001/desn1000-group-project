@@ -1,13 +1,16 @@
 #include <Servo.h>
-// #define COMMENT false
+#define COMMENT true
 
 // TODO: fix up pin numbers (right now they overlap/go to zero)
 
 #define PIN_ULTR_TRIG 51
 #define PIN_ULTR_ECHO 53
 #define PIN_LED 13
-#define PIN_HSERVO 49
+
+#define PIN_CAMERA_HORIZONTAL_SERVO 49
 #define PIN_CLAW 46
+#define PIN_Z_AXIS_1 47
+#define PIN_Z_AXIS_2 48
 
 // no enable pins
 #define MOTOR_FRONT_LEFT_1 4
@@ -30,6 +33,9 @@
 #define MOVEMENT_TURN_RIGHT 4
 #define MOVEMENT_SLIDE_LEFT 5
 #define MOVEMENT_SLIDE_RIGHT 6
+
+
+#define Z_AXIS_TIME_RISE 200 // in ms
 
 Servo servo_camera;
 Servo servo_claw;
@@ -409,6 +415,32 @@ void handle_input(int byte)
         claw_angle = CLAW_ANGLE_MAX;
       }
       servo_claw.write(claw_angle);
+      #ifdef COMMENT
+      Serial.print("; update claw angle");
+      Serial.println(claw_angle);
+      #endif
+    }
+    else if (byte == 'i')
+    {
+      digitalWrite(PIN_Z_AXIS_1, HIGH);
+      digitalWrite(PIN_Z_AXIS_2, LOW);
+      delay(Z_AXIS_TIME_RISE);
+      digitalWrite(PIN_Z_AXIS_1, LOW);
+      digitalWrite(PIN_Z_AXIS_2, LOW);
+      #ifdef COMMENT
+      Serial.println("; rise");
+      #endif
+    }
+    else if (byte == 'k')
+    {
+      digitalWrite(PIN_Z_AXIS_1, LOW);
+      digitalWrite(PIN_Z_AXIS_2, HIGH);
+      delay(Z_AXIS_TIME_RISE);
+      digitalWrite(PIN_Z_AXIS_1, LOW);
+      digitalWrite(PIN_Z_AXIS_2, LOW);
+      #ifdef COMMENT
+      Serial.println("; lower");
+      #endif
     }
     else
     {
@@ -430,7 +462,7 @@ void handle_input(int byte)
 void setup() {
   Serial.begin(9600);
   pinMode(PIN_LED, 13);
-  servo_camera.attach(PIN_HSERVO);
+  servo_camera.attach(PIN_CAMERA_HORIZONTAL_SERVO);
   servo_claw.attach(PIN_CLAW);
 
   Serial.print("PIN_ULTR_TRIG=");
@@ -450,17 +482,20 @@ void setup() {
   Serial.print("MOTOR_FRONT_RIGHT_2=");
   Serial.println(MOTOR_FRONT_RIGHT_2, DEC);
 
+  pinMode(PIN_Z_AXIS_1, OUTPUT);
+  pinMode(PIN_Z_AXIS_2, OUTPUT);
+
   Serial.print("Initialising the motors... ");
   pinMode(MOTOR_FRONT_LEFT_1, OUTPUT);
   pinMode(MOTOR_FRONT_LEFT_2, OUTPUT);
   pinMode(MOTOR_FRONT_RIGHT_1, OUTPUT);
   pinMode(MOTOR_FRONT_RIGHT_2, OUTPUT);
-  Serial.println("Done");
 
   pinMode(MOTOR_BACK_LEFT_1, OUTPUT);
   pinMode(MOTOR_BACK_LEFT_2, OUTPUT);
   pinMode(MOTOR_BACK_RIGHT_1, OUTPUT);
   pinMode(MOTOR_BACK_RIGHT_2, OUTPUT);
+  Serial.println("Done");
 
   Serial.print("Turning everything off... ");
   digitalWrite(MOTOR_FRONT_LEFT_1, LOW);
@@ -472,6 +507,9 @@ void setup() {
   digitalWrite(MOTOR_BACK_LEFT_2, LOW);
   digitalWrite(MOTOR_BACK_RIGHT_1, LOW);
   digitalWrite(MOTOR_BACK_RIGHT_2, LOW);
+
+  digitalWrite(PIN_Z_AXIS_1, LOW);
+  digitalWrite(PIN_Z_AXIS_2, LOW);
   Serial.println("Done");
 
   Serial.println("Initialisation done");
