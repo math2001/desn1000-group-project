@@ -1,7 +1,27 @@
 #include <Servo.h>
-#define COMMENT true
 
-// TODO: fix up pin numbers (right now they overlap/go to zero)
+// how to control the robot
+
+// 'f' = move forward
+// 'b' = move backwards
+// 'l' = turn left
+// 'r' = turn right
+// 'L' = slide left
+// 'R' = slide right
+// '0', ..., '5' = set speed
+// 's90.' = stop the vehicles, and scan +/- 10 degrees around 90 deg
+// 'o' = turn on observing mode (camera rotates from right to left)
+// 'm' = toggle between slow mode and fast mode (slow mode means when you move
+//       forward, it stops moving after 100ms automatically)
+// 'c90.' = set claw angle to 90 deg (works for any number of course)
+// 'i' = raise claw (z-axis)
+// 'k' = lower claw (z-axis)
+
+// uncomment this line to have the client print comments explaining what 
+// the robot is doing
+// #define COMMENT true
+
+
 
 #define PIN_ULTR_TRIG 51
 #define PIN_ULTR_ECHO 53
@@ -34,8 +54,7 @@
 #define MOVEMENT_SLIDE_LEFT 5
 #define MOVEMENT_SLIDE_RIGHT 6
 
-
-#define Z_AXIS_TIME_RISE 200 // in ms
+#define Z_AXIS_TIME_RISE 100 // in ms
 
 Servo servo_camera;
 Servo servo_claw;
@@ -387,6 +406,8 @@ void handle_input(int byte)
     else if (byte == 'm')
     {
       slow_mode = !slow_mode;
+      Serial.print("; slow mode=");
+      Serial.println(slow_mode);
     }
     else if (byte == 'o')
     {
@@ -444,7 +465,7 @@ void handle_input(int byte)
     }
     else
     {
-        Serial.print("Unknown command '");
+        Serial.print("; Unknown command '");
         Serial.print(byte);
         Serial.println("' For safety, the vehicule was stopped");
         movement = MOVEMENT_STOP;
@@ -553,7 +574,10 @@ void loop() {
     set_hangle(90 + hangle);
   }
 
+  // if you want to prevent the robot from sending you a lot of measurements
+  // all the time, just comment the line below (measure_angle)
   measure(hangle);
+
   if (Serial.available())
   {
     handle_input(Serial.read());
